@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,8 +24,13 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 
-Route::resource('categories', App\Http\Controllers\CategoryController::class);
+// PUBLIC (svi mogu da vide proizvode)
+Route::resource('products', ProductController::class)->only(['index', 'show']);
 
-Route::resource('products', App\Http\Controllers\ProductController::class);
+// ADMIN (samo admin može CRUD)
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class)->except(['index', 'show']);
+    Route::resource('orders', OrderController::class);
+});
 
-Route::resource('orders', App\Http\Controllers\OrderController::class);

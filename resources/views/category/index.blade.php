@@ -1,7 +1,8 @@
-{{--
-    @extends('layouts.app')
+<h1>Categories</h1>
 
-    @section('content')
-        category.index template
-    @endsection
---}}
+<ul>
+    @foreach($categories as $category)
+        <li>{{ $category->name }}</li>
+    @endforeach
+</ul>
+

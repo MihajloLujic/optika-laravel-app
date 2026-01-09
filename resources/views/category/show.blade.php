@@ -1,7 +1,3 @@
-{{--
-    @extends('layouts.app')
+<h1>{{ $category->name }}</h1>
 
-    @section('content')
-        category.show template
-    @endsection
---}}
+<p>Slug: {{ $category->slug }}</p>
