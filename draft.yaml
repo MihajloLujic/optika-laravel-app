@@ -1,0 +1,27 @@
+models:
+  Category:
+    name: string
+    slug: string unique
+
+  Product:
+    category_id: id foreign:categories
+    name: string
+    slug: string unique
+    description: text nullable
+    price: decimal:8,2
+    stock: integer default:0
+
+  Order:
+    user_id: id foreign:users
+    total: decimal:8,2 default:0
+    status: enum:pending,paid,cancelled default:pending
+
+seeders: Category, Product, Order
+
+controllers:
+  Category:
+    resource: web
+  Product:
+    resource: web
+  Order:
+    resource: web

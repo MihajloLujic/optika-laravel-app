@@ -1,0 +1,44 @@
+created:
+    - app/Http/Controllers/CategoryController.php
+    - app/Http/Controllers/ProductController.php
+    - app/Http/Controllers/OrderController.php
+    - database/factories/CategoryFactory.php
+    - database/factories/ProductFactory.php
+    - database/factories/OrderFactory.php
+    - database/migrations/2026_01_09_180947_create_categories_table.php
+    - database/migrations/2026_01_09_180948_create_products_table.php
+    - database/migrations/2026_01_09_180949_create_orders_table.php
+    - app/Models/Category.php
+    - app/Models/Product.php
+    - app/Models/Order.php
+    - database/seeders/CategorySeeder.php
+    - database/seeders/ProductSeeder.php
+    - database/seeders/OrderSeeder.php
+    - tests/Feature/Http/Controllers/CategoryControllerTest.php
+    - tests/Feature/Http/Controllers/ProductControllerTest.php
+    - tests/Feature/Http/Controllers/OrderControllerTest.php
+    - app/Http/Requests/CategoryStoreRequest.php
+    - app/Http/Requests/CategoryUpdateRequest.php
+    - app/Http/Requests/ProductStoreRequest.php
+    - app/Http/Requests/ProductUpdateRequest.php
+    - app/Http/Requests/OrderStoreRequest.php
+    - app/Http/Requests/OrderUpdateRequest.php
+    - resources/views/category/index.blade.php
+    - resources/views/category/create.blade.php
+    - resources/views/category/show.blade.php
+    - resources/views/category/edit.blade.php
+    - resources/views/product/index.blade.php
+    - resources/views/product/create.blade.php
+    - resources/views/product/show.blade.php
+    - resources/views/product/edit.blade.php
+    - resources/views/order/index.blade.php
+    - resources/views/order/create.blade.php
+    - resources/views/order/show.blade.php
+    - resources/views/order/edit.blade.php
+updated:
+    - routes/web.php
+models:
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable default:NULL', password: string, remember_token: 'string:100 nullable default:NULL' }
+    Category: { name: string, slug: 'string unique' }
+    Product: { category_id: 'id foreign:categories', name: string, slug: 'string unique', description: 'text nullable', price: 'decimal:8,2', stock: 'integer default:0' }
+    Order: { user_id: 'id foreign:users', total: 'decimal:8,2 default:0', status: 'enum:pending,paid,cancelled default:pending' }
