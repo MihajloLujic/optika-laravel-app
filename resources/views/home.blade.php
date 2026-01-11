@@ -40,6 +40,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Kontakt</a>
                 </li>
+                @auth
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" href="{{ route('cart.index') }}">
+                            🛒 Korpa
+                            @if(session('cart') && count(session('cart')) > 0)
+                                ({{ count(session('cart')) }})
+                            @endif
+                        </a>
+                    </li>
+                @endauth
+
 
                 @guest
                     <li class="nav-item ms-3">
