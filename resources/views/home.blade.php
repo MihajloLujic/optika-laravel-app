@@ -77,6 +77,11 @@
         </div>
     </div>
 </nav>
+@if(session('success'))
+    <div class="alert alert-success text-center">
+        {{ session('success') }}
+    </div>
+@endif
 
 <div class="container mt-5">
 

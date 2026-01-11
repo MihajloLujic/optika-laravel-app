@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+
 class OrderController extends Controller
 {
     public function index(Request $request)
@@ -63,4 +64,67 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index');
     }
+
+
+    public function checkout()
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Korpa je prazna.');
+        }
+
+        return view('checkout.index', compact('cart'));
+    }
+
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|string|max:50',
+        ]);
+
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Korpa je prazna.');
+        }
+
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        \App\Models\Order::create([
+            'user_id' => auth()->id(),
+            'full_name' => $request->full_name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'total' => $total,
+            'status' => 'pending',
+        ]);
+
+        session()->forget('cart');
+
+        return redirect()->route('home')->with('success', 'Porudžbina je uspešno poslata!');
+        }
+    public function markAsPaid(Order $order)
+        {
+            $order->update(['status' => 'paid']);
+            return redirect()->back()->with('success', 'Porudžbina označena kao plaćena.');
+        }
+
+    public function markAsCancelled(Order $order)
+        {
+            $order->update(['status' => 'cancelled']);
+            return redirect()->back()->with('success', 'Porudžbina otkazana.');
+        }
+        
+    public function markAsPending(Order $order)
+        {
+            $order->update(['status' => 'pending']);
+            return redirect()->back()->with('success', 'Status postavljen na PENDING.');
+        }
+
 }

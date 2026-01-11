@@ -16,10 +16,14 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'total',
-        'status',
+    'user_id',
+    'full_name',
+    'address',
+    'phone',
+    'total',
+    'status',
     ];
+
 
     /**
      * Get the attributes that should be cast.

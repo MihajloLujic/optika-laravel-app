@@ -19,6 +19,10 @@ return new class extends Migration
             $table->decimal('total', 8, 2)->default(0);
             $table->enum('status', ["pending","paid","cancelled"])->default('pending');
             $table->timestamps();
+            $table->string('full_name');
+            $table->string('address');
+            $table->string('phone');
+
         });
 
         Schema::enableForeignKeyConstraints();

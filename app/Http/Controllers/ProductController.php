@@ -62,4 +62,10 @@ class ProductController extends Controller
 
         return redirect()->route('products.index');
     }
+    public function adminIndex()
+    {
+        $products = Product::all();
+        return view('admin.products.index', compact('products'));
+    }
+
 }

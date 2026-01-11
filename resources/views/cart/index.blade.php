@@ -64,6 +64,12 @@
         </table>
 
         <a href="/products" class="btn btn-secondary">Nastavi kupovinu</a>
+
+        <a href="{{ route('checkout.index') }}" class="btn btn-success ms-2">
+            Završi kupovinu
+        </a>
+
+
     @endif
 
 </div>
