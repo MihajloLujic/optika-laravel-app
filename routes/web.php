@@ -80,3 +80,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Users
     Route::resource('users', UserController::class)->only(['index', 'store', 'destroy']);
 });
+
+Route::view('/onama', 'about')->name('about');
+Route::view('/kontakt', 'contact')->name('contact');

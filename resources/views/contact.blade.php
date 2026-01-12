@@ -2,19 +2,10 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <title>Optika</title>
-
-    <!-- Bootstrap 5 -->
+    <title>Kontakt | Optika</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .brand-big {
-            font-size: 28px;
-            font-weight: bold;
-        }
-    </style>
 </head>
-<body>
+<body class="bg-light">
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
@@ -77,43 +68,63 @@
         </div>
     </div>
 </nav>
-@if(session('success'))
-    <div class="alert alert-success text-center">
-        {{ session('success') }}
-    </div>
-@endif
+<div class="container py-5">
 
-<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h1 class="fw-bold mb-3">Kontaktirajte nas</h1>
+            <p class="mb-4">
+                Imate pitanje, sugestiju ili vam je potrebna pomoć? Slobodno nam pišite.
+            </p>
 
-    <!-- NASLOV -->
-    <div class="row mb-4">
-        <div class="col text-center">
-            <h1 class="fw-bold">Katalog</h1>
-            <p class="text-muted">Izdvojeni proizvodi iz naše ponude</p>
-        </div>
-    </div>
-
-    <!-- PROIZVODI - CENTRIRANI -->
-    <div class="row justify-content-center">
-        @foreach($products as $product)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow-sm text-center">
-                    <img src="https://via.placeholder.com/300x200?text=Optika"
-                         class="card-img-top"
-                         alt="{{ $product->name }}">
-
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text fw-bold">{{ $product->price }} RSD</p>
-                    </div>
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Ime i prezime</label>
+                    <input type="text" class="form-control" placeholder="Unesite ime i prezime">
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" placeholder="Unesite email adresu">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Poruka</label>
+                    <textarea class="form-control" rows="5" placeholder="Unesite vašu poruku"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Pošalji poruku</button>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h4 class="fw-bold mb-3">Naši podaci</h4>
+            <p><strong>Adresa:</strong> Bulevar kralja Aleksandra 123, Beograd</p>
+            <p><strong>Telefon:</strong> 011/123-4567</p>
+            <p><strong>Email:</strong> info@optika.rs</p>
+
+            <div class="mt-4">
+                <iframe
+                    src="https://maps.google.com/maps?q=Belgrade&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="300"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy">
+                </iframe>
             </div>
-        @endforeach
+        </div>
     </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="bg-light text-secondary text-center py-4 mt-5 border-top">
+    <p class="mb-1 fw-semibold">Optika</p>
+    <p class="mb-0 small">
+        © {{ date('Y') }} Sva prava zadržana.
+    </p>
+</footer>
+
+
 </body>
 </html>
- n

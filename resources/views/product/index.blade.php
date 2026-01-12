@@ -17,31 +17,37 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ route('home') }}">Optika</a>
+        <!-- LEVO: OPTIKA -->
+        <a class="navbar-brand brand-big" href="{{ route('home') }}">Optika</a>
 
-        <div class="collapse navbar-collapse justify-content-end">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- DESNO -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('home') }}">Početna</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/products">Ponuda</a>
+                    <a class="nav-link" href="{{ route('public.products.index') }}">Ponuda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">O nama</a>
+                    <a class="nav-link" href="{{ route('about') }}">O nama</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Kontakt</a>
+                    <a class="nav-link" href="{{ route('contact') }}">Kontakt</a>
                 </li>
                 @auth
-                <li class="nav-item">
-                    <a class="nav-link fw-bold" href="{{ route('cart.index') }}">
-                        🛒 Korpa
-                        @if(session('cart') && count(session('cart')) > 0)
-                            ({{ count(session('cart')) }})
-                        @endif
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" href="{{ route('cart.index') }}">
+                            🛒 Korpa
+                            @if(session('cart') && count(session('cart')) > 0)
+                                ({{ count(session('cart')) }})
+                            @endif
+                        </a>
+                    </li>
                 @endauth
 
 

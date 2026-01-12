@@ -2,19 +2,10 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <title>Optika</title>
-
-    <!-- Bootstrap 5 -->
+    <title>O nama | Optika</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .brand-big {
-            font-size: 28px;
-            font-weight: bold;
-        }
-    </style>
 </head>
-<body>
+<body class="bg-light">
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
@@ -77,43 +68,53 @@
         </div>
     </div>
 </nav>
-@if(session('success'))
-    <div class="alert alert-success text-center">
-        {{ session('success') }}
-    </div>
-@endif
+<div class="container py-5">
 
-<div class="container mt-5">
-
-    <!-- NASLOV -->
-    <div class="row mb-4">
-        <div class="col text-center">
-            <h1 class="fw-bold">Katalog</h1>
-            <p class="text-muted">Izdvojeni proizvodi iz naše ponude</p>
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="fw-bold mb-3">O nama</h1>
+            <p class="lead">
+                Dobrodošli u našu optičarsku radnju – mesto gde se kvalitet, stil i briga o vašem vidu spajaju.
+            </p>
+            <p>
+                Naša optika posluje već više od 10 godina i nudi širok asortiman dioptrijskih i sunčanih naočara,
+                kontaktnih sočiva i prateće opreme. Sarađujemo sa poznatim svetskim brendovima i garantujemo kvalitet
+                svakog proizvoda.
+            </p>
+            <p>
+                Naš stručni tim je tu da vam pomogne u izboru idealnih naočara koje odgovaraju vašim potrebama i stilu.
+            </p>
+        </div>
+        <div class="col-md-6 text-center">
+            <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5" class="img-fluid rounded shadow" alt="Optika">
         </div>
     </div>
 
-    <!-- PROIZVODI - CENTRIRANI -->
-    <div class="row justify-content-center">
-        @foreach($products as $product)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow-sm text-center">
-                    <img src="https://via.placeholder.com/300x200?text=Optika"
-                         class="card-img-top"
-                         alt="{{ $product->name }}">
-
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text fw-bold">{{ $product->price }} RSD</p>
-                    </div>
-                </div>
-            </div>
-        @endforeach
+    <div class="row text-center">
+        <div class="col-md-4">
+            <h4 class="fw-bold">✔ Kvalitet</h4>
+            <p>Provereni brendovi i sertifikovani proizvodi.</p>
+        </div>
+        <div class="col-md-4">
+            <h4 class="fw-bold">✔ Iskustvo</h4>
+            <p>Više od decenije uspešnog rada sa klijentima.</p>
+        </div>
+        <div class="col-md-4">
+            <h4 class="fw-bold">✔ Podrška</h4>
+            <p>Ljubazno osoblje i stručni saveti.</p>
+        </div>
     </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="bg-light text-secondary text-center py-4 mt-5 border-top">
+    <p class="mb-1 fw-semibold">Optika</p>
+    <p class="mb-0 small">
+        © {{ date('Y') }} Sva prava zadržana.
+    </p>
+</footer>
+
+
+
 </body>
 </html>
- n
