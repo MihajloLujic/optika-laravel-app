@@ -8,27 +8,39 @@ on:
 
 jobs:
   laravel-tests:
+
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: 8.2
 
-    - name: Copy .env
-      run: cp .env.example .env
-
     - name: Install Dependencies
       run: composer install --no-progress --prefer-dist
+
+    - name: Copy .env
+      run: cp .env.example .env
 
     - name: Generate key
       run: php artisan key:generate
 
+    - name: Create SQLite database
+      run: |
+        mkdir -p database
+        touch database/database.sqlite
+
     - name: Run Migrations
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
       run: php artisan migrate --force
 
     - name: Run Tests
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
       run: php artisan test
