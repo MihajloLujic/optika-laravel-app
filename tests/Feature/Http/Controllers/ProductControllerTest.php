@@ -2,162 +2,102 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use JMac\Testing\Traits\AdditionalAssertions;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/**
- * @see \App\Http\Controllers\ProductController
- */
-final class ProductControllerTest extends TestCase
+class ProductControllerTest extends TestCase
 {
-    use AdditionalAssertions, RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
-    #[Test]
-    public function index_displays_view(): void
+    protected function loginAdmin()
     {
-        $products = Product::factory()->count(3)->create();
-
-        $response = $this->get(route('products.index'));
-
-        $response->assertOk();
-        $response->assertViewIs('product.index');
-        $response->assertViewHas('products', $products);
+        $admin = User::factory()->create(['is_admin' => 1]);
+        $this->actingAs($admin);
     }
 
-
-    #[Test]
-    public function create_displays_view(): void
+    public function test_index_displays_products()
     {
-        $response = $this->get(route('products.create'));
+        $this->loginAdmin();
 
-        $response->assertOk();
-        $response->assertViewIs('product.create');
+        Product::factory()->count(3)->create();
+
+        $response = $this->get('/admin/products');
+
+        $response->assertStatus(200);
     }
 
-
-    #[Test]
-    public function store_uses_form_request_validation(): void
+    public function test_create_displays_form()
     {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\ProductController::class,
-            'store',
-            \App\Http\Requests\ProductStoreRequest::class
-        );
+        $this->loginAdmin();
+
+        $response = $this->get('/admin/products/create');
+
+        $response->assertStatus(200);
     }
 
-    #[Test]
-    public function store_saves_and_redirects(): void
+    public function test_store_creates_product()
     {
+        $this->loginAdmin();
+
         $category = Category::factory()->create();
-        $name = fake()->name();
-        $slug = fake()->slug();
-        $price = fake()->randomFloat(/** decimal_attributes **/);
-        $stock = fake()->numberBetween(-10000, 10000);
 
-        $response = $this->post(route('products.store'), [
+        $data = [
             'category_id' => $category->id,
-            'name' => $name,
-            'slug' => $slug,
-            'price' => $price,
-            'stock' => $stock,
-        ]);
+            'name' => 'Test proizvod',
+            'slug' => 'test-proizvod',
+            'price' => 1234,
+            'stock' => 5,
+        ];
 
-        $products = Product::query()
-            ->where('category_id', $category->id)
-            ->where('name', $name)
-            ->where('slug', $slug)
-            ->where('price', $price)
-            ->where('stock', $stock)
-            ->get();
-        $this->assertCount(1, $products);
-        $product = $products->first();
+        $response = $this->post('/admin/products', $data);
 
-        $response->assertRedirect(route('products.index'));
-        $response->assertSessionHas('product.id', $product->id);
+        $this->assertDatabaseHas('products', ['name' => 'Test proizvod']);
+        $response->assertRedirect('/admin/products');
     }
 
-
-    #[Test]
-    public function show_displays_view(): void
+    public function test_edit_displays_form()
     {
+        $this->loginAdmin();
+
         $product = Product::factory()->create();
 
-        $response = $this->get(route('products.show', $product));
+        $response = $this->get("/admin/products/{$product->id}/edit");
 
-        $response->assertOk();
-        $response->assertViewIs('product.show');
-        $response->assertViewHas('product', $product);
+        $response->assertStatus(200);
     }
 
-
-    #[Test]
-    public function edit_displays_view(): void
+    public function test_update_updates_product()
     {
+        $this->loginAdmin();
+
         $product = Product::factory()->create();
 
-        $response = $this->get(route('products.edit', $product));
+        $data = [
+            'name' => 'Izmenjen proizvod',
+            'slug' => 'izmenjen-proizvod',
+            'price' => 2000,
+            'stock' => 10,
+            'category_id' => $product->category_id,
+        ];
 
-        $response->assertOk();
-        $response->assertViewIs('product.edit');
-        $response->assertViewHas('product', $product);
+        $response = $this->put("/admin/products/{$product->id}", $data);
+
+        $this->assertDatabaseHas('products', ['name' => 'Izmenjen proizvod']);
+        $response->assertRedirect('/admin/products');
     }
 
-
-    #[Test]
-    public function update_uses_form_request_validation(): void
+    public function test_destroy_deletes_product()
     {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\ProductController::class,
-            'update',
-            \App\Http\Requests\ProductUpdateRequest::class
-        );
-    }
+        $this->loginAdmin();
 
-    #[Test]
-    public function update_redirects(): void
-    {
-        $product = Product::factory()->create();
-        $category = Category::factory()->create();
-        $name = fake()->name();
-        $slug = fake()->slug();
-        $price = fake()->randomFloat(/** decimal_attributes **/);
-        $stock = fake()->numberBetween(-10000, 10000);
-
-        $response = $this->put(route('products.update', $product), [
-            'category_id' => $category->id,
-            'name' => $name,
-            'slug' => $slug,
-            'price' => $price,
-            'stock' => $stock,
-        ]);
-
-        $product->refresh();
-
-        $response->assertRedirect(route('products.index'));
-        $response->assertSessionHas('product.id', $product->id);
-
-        $this->assertEquals($category->id, $product->category_id);
-        $this->assertEquals($name, $product->name);
-        $this->assertEquals($slug, $product->slug);
-        $this->assertEquals($price, $product->price);
-        $this->assertEquals($stock, $product->stock);
-    }
-
-
-    #[Test]
-    public function destroy_deletes_and_redirects(): void
-    {
         $product = Product::factory()->create();
 
-        $response = $this->delete(route('products.destroy', $product));
+        $response = $this->delete("/admin/products/{$product->id}");
 
-        $response->assertRedirect(route('products.index'));
-
-        $this->assertModelMissing($product);
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $response->assertRedirect('/admin/products');
     }
 }

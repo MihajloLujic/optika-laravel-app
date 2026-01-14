@@ -3,142 +3,92 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use JMac\Testing\Traits\AdditionalAssertions;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/**
- * @see \App\Http\Controllers\CategoryController
- */
-final class CategoryControllerTest extends TestCase
+class CategoryControllerTest extends TestCase
 {
-    use AdditionalAssertions, RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
-    #[Test]
-    public function index_displays_view(): void
+    protected function loginAdmin()
     {
-        $categories = Category::factory()->count(3)->create();
-
-        $response = $this->get(route('categories.index'));
-
-        $response->assertOk();
-        $response->assertViewIs('category.index');
-        $response->assertViewHas('categories', $categories);
+        $admin = User::factory()->create(['is_admin' => 1]);
+        $this->actingAs($admin);
     }
 
-
-    #[Test]
-    public function create_displays_view(): void
+    public function test_index_displays_categories()
     {
-        $response = $this->get(route('categories.create'));
+        $this->loginAdmin();
 
-        $response->assertOk();
-        $response->assertViewIs('category.create');
+        Category::factory()->count(3)->create();
+
+        $response = $this->get('/admin/categories');
+
+        $response->assertStatus(200);
     }
 
-
-    #[Test]
-    public function store_uses_form_request_validation(): void
+    public function test_create_displays_form()
     {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\CategoryController::class,
-            'store',
-            \App\Http\Requests\CategoryStoreRequest::class
-        );
+        $this->loginAdmin();
+
+        $response = $this->get('/admin/categories/create');
+
+        $response->assertStatus(200);
     }
 
-    #[Test]
-    public function store_saves_and_redirects(): void
+    public function test_store_creates_category()
     {
-        $name = fake()->name();
-        $slug = fake()->slug();
+        $this->loginAdmin();
 
-        $response = $this->post(route('categories.store'), [
-            'name' => $name,
-            'slug' => $slug,
-        ]);
+        $data = [
+            'name' => 'Test kategorija',
+            'slug' => 'test-kategorija',
+        ];
 
-        $categories = Category::query()
-            ->where('name', $name)
-            ->where('slug', $slug)
-            ->get();
-        $this->assertCount(1, $categories);
-        $category = $categories->first();
+        $response = $this->post('/admin/categories', $data);
 
-        $response->assertRedirect(route('categories.index'));
-        $response->assertSessionHas('category.id', $category->id);
+        $this->assertDatabaseHas('categories', $data);
+        $response->assertRedirect('/admin/categories');
     }
 
-
-    #[Test]
-    public function show_displays_view(): void
+    public function test_edit_displays_form()
     {
+        $this->loginAdmin();
+
         $category = Category::factory()->create();
 
-        $response = $this->get(route('categories.show', $category));
+        $response = $this->get("/admin/categories/{$category->id}/edit");
 
-        $response->assertOk();
-        $response->assertViewIs('category.show');
-        $response->assertViewHas('category', $category);
+        $response->assertStatus(200);
     }
 
-
-    #[Test]
-    public function edit_displays_view(): void
+    public function test_update_updates_category()
     {
+        $this->loginAdmin();
+
         $category = Category::factory()->create();
 
-        $response = $this->get(route('categories.edit', $category));
+        $data = [
+            'name' => 'Izmenjena',
+            'slug' => 'izmenjena',
+        ];
 
-        $response->assertOk();
-        $response->assertViewIs('category.edit');
-        $response->assertViewHas('category', $category);
+        $response = $this->put("/admin/categories/{$category->id}", $data);
+
+        $this->assertDatabaseHas('categories', $data);
+        $response->assertRedirect('/admin/categories');
     }
 
-
-    #[Test]
-    public function update_uses_form_request_validation(): void
+    public function test_destroy_deletes_category()
     {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\CategoryController::class,
-            'update',
-            \App\Http\Requests\CategoryUpdateRequest::class
-        );
-    }
+        $this->loginAdmin();
 
-    #[Test]
-    public function update_redirects(): void
-    {
-        $category = Category::factory()->create();
-        $name = fake()->name();
-        $slug = fake()->slug();
-
-        $response = $this->put(route('categories.update', $category), [
-            'name' => $name,
-            'slug' => $slug,
-        ]);
-
-        $category->refresh();
-
-        $response->assertRedirect(route('categories.index'));
-        $response->assertSessionHas('category.id', $category->id);
-
-        $this->assertEquals($name, $category->name);
-        $this->assertEquals($slug, $category->slug);
-    }
-
-
-    #[Test]
-    public function destroy_deletes_and_redirects(): void
-    {
         $category = Category::factory()->create();
 
-        $response = $this->delete(route('categories.destroy', $category));
+        $response = $this->delete("/admin/categories/{$category->id}");
 
-        $response->assertRedirect(route('categories.index'));
-
-        $this->assertModelMissing($category);
+        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $response->assertRedirect('/admin/categories');
     }
 }

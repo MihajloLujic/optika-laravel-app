@@ -5,147 +5,74 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use JMac\Testing\Traits\AdditionalAssertions;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/**
- * @see \App\Http\Controllers\OrderController
- */
-final class OrderControllerTest extends TestCase
+class OrderControllerTest extends TestCase
 {
-    use AdditionalAssertions, RefreshDatabase, WithFaker;
+    use RefreshDatabase;
 
-    #[Test]
-    public function index_displays_view(): void
+    protected function loginAdmin()
     {
-        $orders = Order::factory()->count(3)->create();
-
-        $response = $this->get(route('orders.index'));
-
-        $response->assertOk();
-        $response->assertViewIs('order.index');
-        $response->assertViewHas('orders', $orders);
+        $admin = User::factory()->create(['is_admin' => 1]);
+        $this->actingAs($admin);
     }
 
-
-    #[Test]
-    public function create_displays_view(): void
+    public function test_index_displays_orders()
     {
-        $response = $this->get(route('orders.create'));
+        $this->loginAdmin();
 
-        $response->assertOk();
-        $response->assertViewIs('order.create');
+        Order::factory()->count(3)->create();
+
+        $response = $this->get('/admin/orders');
+
+        $response->assertStatus(200);
     }
 
-
-    #[Test]
-    public function store_uses_form_request_validation(): void
+    public function test_can_mark_order_as_paid()
     {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\OrderController::class,
-            'store',
-            \App\Http\Requests\OrderStoreRequest::class
-        );
-    }
+        $this->loginAdmin();
 
-    #[Test]
-    public function store_saves_and_redirects(): void
-    {
-        $user = User::factory()->create();
-        $total = fake()->randomFloat(/** decimal_attributes **/);
-        $status = fake()->randomElement(/** enum_attributes **/);
+        $order = Order::factory()->create(['status' => 'pending']);
 
-        $response = $this->post(route('orders.store'), [
-            'user_id' => $user->id,
-            'total' => $total,
-            'status' => $status,
+        $response = $this->patch("/admin/orders/{$order->id}/paid");
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'paid',
         ]);
 
-        $orders = Order::query()
-            ->where('user_id', $user->id)
-            ->where('total', $total)
-            ->where('status', $status)
-            ->get();
-        $this->assertCount(1, $orders);
-        $order = $orders->first();
-
-        $response->assertRedirect(route('orders.index'));
-        $response->assertSessionHas('order.id', $order->id);
+        $response->assertRedirect();
     }
 
-
-    #[Test]
-    public function show_displays_view(): void
+    public function test_can_mark_order_as_cancelled()
     {
-        $order = Order::factory()->create();
+        $this->loginAdmin();
 
-        $response = $this->get(route('orders.show', $order));
+        $order = Order::factory()->create(['status' => 'pending']);
 
-        $response->assertOk();
-        $response->assertViewIs('order.show');
-        $response->assertViewHas('order', $order);
-    }
+        $response = $this->patch("/admin/orders/{$order->id}/cancel");
 
-
-    #[Test]
-    public function edit_displays_view(): void
-    {
-        $order = Order::factory()->create();
-
-        $response = $this->get(route('orders.edit', $order));
-
-        $response->assertOk();
-        $response->assertViewIs('order.edit');
-        $response->assertViewHas('order', $order);
-    }
-
-
-    #[Test]
-    public function update_uses_form_request_validation(): void
-    {
-        $this->assertActionUsesFormRequest(
-            \App\Http\Controllers\OrderController::class,
-            'update',
-            \App\Http\Requests\OrderUpdateRequest::class
-        );
-    }
-
-    #[Test]
-    public function update_redirects(): void
-    {
-        $order = Order::factory()->create();
-        $user = User::factory()->create();
-        $total = fake()->randomFloat(/** decimal_attributes **/);
-        $status = fake()->randomElement(/** enum_attributes **/);
-
-        $response = $this->put(route('orders.update', $order), [
-            'user_id' => $user->id,
-            'total' => $total,
-            'status' => $status,
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'cancelled',
         ]);
 
-        $order->refresh();
-
-        $response->assertRedirect(route('orders.index'));
-        $response->assertSessionHas('order.id', $order->id);
-
-        $this->assertEquals($user->id, $order->user_id);
-        $this->assertEquals($total, $order->total);
-        $this->assertEquals($status, $order->status);
+        $response->assertRedirect();
     }
 
-
-    #[Test]
-    public function destroy_deletes_and_redirects(): void
+    public function test_can_mark_order_as_pending()
     {
-        $order = Order::factory()->create();
+        $this->loginAdmin();
 
-        $response = $this->delete(route('orders.destroy', $order));
+        $order = Order::factory()->create(['status' => 'paid']);
 
-        $response->assertRedirect(route('orders.index'));
+        $response = $this->patch("/admin/orders/{$order->id}/pending");
 
-        $this->assertModelMissing($order);
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'pending',
+        ]);
+
+        $response->assertRedirect();
     }
 }

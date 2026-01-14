@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'total' => fake()->randomFloat(2, 0, 999999.99),
-            'status' => fake()->randomElement(["pending","paid","cancelled"]),
+            'user_id'   => User::factory(),
+            'full_name' => $this->faker->name,
+            'address'   => $this->faker->address,
+            'phone'     => $this->faker->phoneNumber,
+            'total'     => $this->faker->randomFloat(2, 1000, 50000),
+            'status'    => $this->faker->randomElement(['pending', 'paid', 'cancelled']),
         ];
     }
 }
